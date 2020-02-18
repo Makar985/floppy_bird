@@ -351,7 +351,8 @@ def eval_genomes(genomes, config):
             if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():  # determine whether to use the first or second
                 pipe_ind = 1                                                                 # pipe on the screen for neural network input
 
-        for x, bird in enumerate(birds):  # give each bird a fitness of 0.1 for each frame it stays alive
+        for x, bird in enumerate(birds):  
+            # give each bird a fitness of 0.1 for each frame it stays alive
             ge[x].fitness += 0.1
             bird.move()
 
