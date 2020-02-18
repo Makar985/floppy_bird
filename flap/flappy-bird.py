@@ -6,11 +6,14 @@ import os
 import random
 import time
 pygame.font.init()
+#AI variables defining
+#number of generations
+GEN = 0 
 
 #basic variable defining
 WIN_WIDTH = 500
 WIN_HEIGHT = 800
-
+#Images
 BIRD_IMGS = [
     pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", 'bird1.png'))),
     pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", 'bird2.png'))),
@@ -143,13 +146,15 @@ class Base:
     def draw(self, win):
         win.blit(self.IMG, (self.x1, self.y))
         win.blit(self.IMG, (self.x2, self.y))     
-def draw_window(win, birds, pipes, base, score):
+def draw_window(win, birds, pipes, base, score, gen):
     win.blit(BG_IMG, (0, 0))
     for pipe in pipes:
         pipe.draw(win)
         
     text = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
     win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
+    text = STAT_FONT.render("Gen: " + str(gen), 1, (255, 255, 255))
+    win.blit(text, (10, 10))
     base.draw(win)
     for bird in birds:
         bird.draw(win)
@@ -157,6 +162,8 @@ def draw_window(win, birds, pipes, base, score):
  
         
 def main(genomes, config):
+    global GEN
+    GEN += 1
     #Ai variables
     nets = []
     ge = []
@@ -164,10 +171,12 @@ def main(genomes, config):
  
     for _, g in genomes:
         #setting up nets for genomes
+        #starting fitness = 0
+        g.fitness = 0
+        #the nets themselves
         net = neat.nn.FeedForwardNetwork.create(g, config)
         nets.append(net)
         birds.append(Bird(230, 350))
-        g.fitness
         ge.append(g)
     #Other variables
     base = Base(730)
@@ -199,7 +208,7 @@ def main(genomes, config):
             #bird flyes
             bird.move()
             #creating an output result
-            output = net[x].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y  - pipes[pipe_ind].bottom)))
+            output = nets[x].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y  - pipes[pipe_ind].bottom)))
             
             if output[0] > 0.5:
                 bird.jump()
@@ -235,7 +244,7 @@ def main(genomes, config):
                 nets.pop(x)
                 ge.pop(x)
         base.move()    
-        draw_window(win, birds, pipes, base, score)
+        draw_window(win, birds, pipes, base, score, GEN)
     
 
 
